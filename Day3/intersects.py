@@ -1,20 +1,17 @@
-#intersects.py
-#by Giovanni Prinzivalli
-#05 December, 2019
-
-#open the file. Returns two wires to be plotted.
+#open the file. Returns any number of wires to be plotted as a list.
 def initWires(filename):
- with open(filename, "r") as f:
-  print(wire) for wire in f.readlines()
-return wires
+  with open(filename, "r") as f:
+    wires = list(line.replace("\n", "") for line in f.readlines())
+  return wires
 
-#Plot both wires. Returns a list of tuples corresponding to the positions of the line
+#Plot a given wire. Returns a list of tuples corresponding to the positions of the line
 def plotWire(wire):
   pos = [0,0]
-  #Traverse the path of the wire
+  
   for instr in wire.split(","):
-    #go the direction a number of times
-    yield tuple(pos)
+    for i in range(int(instr[1:])):
+      pos[0 if (instr[0] == 'L' or instr[0] == 'R') else 1] += -1 if (instr[0] == 'L' or instr[0] == 'D') else 1
+      yield tuple(pos)
 
 #Find the intersect of the wires. Returns the shortest distance.
 def shortManDist(wire1, wire2):
@@ -22,9 +19,16 @@ def shortManDist(wire1, wire2):
   return min(abs(x) + abs(y) for (x, y) in intersects)
 
 wires = initWires("wires.txt")
-test1 = initWires(wireTest1)
-test2 = initWires(wireTest2)
+wire1 = plotWire(wires[0])
+wire2 = plotWire(wires[1])
+print(shortManDist(wire1, wire2))
 
-print(wires)
-print(test1)
-print(test2)
+wires = initWires("wireTest1")
+wire1 = plotWire(wires[0])
+wire2 = plotWire(wires[1])
+print(shortManDist(wire1, wire2))
+
+wires = initWires("wireTest2")
+wire1 = plotWire(wires[0])
+wire2 = plotWire(wires[1])
+print(shortManDist(wire1, wire2))
