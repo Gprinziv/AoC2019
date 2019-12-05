@@ -13,35 +13,40 @@ def initArray(filename):
   return newArray
 
 def operateOn(array):
+  nArr = array.copy()
   p = 0
   while True:
 
-    if array[p] == 1:
-      print("OPCODE 1: Performing addition")
-      print("Cell " + str(array[p+1]) + "; value: " + str(array[array[p+1]]))
-      print("Cell " + str(array[p+2]) + "; value: " + str(array[array[p+2]]))
-      print("Storing in location " + str(array[p+3]) + "\n")
-      array[array[p+3]] = array[array[p+1]] + array[array[p+2]]
+    if nArr[p] == 1:
+      nArr[nArr[p+3]] = nArr[nArr[p+1]] + nArr[nArr[p+2]]
       p += 4
 
-    elif array[p] == 2:
-      print("OPCODE 2: Performing multiplication")
-      print("Cell " + str(array[p+1]) + "; value: " + str(array[array[p+1]]))
-      print("Cell " + str(array[p+2]) + "; value: " + str(array[array[p+2]]))
-      print("Storing in location " + str(array[p+3]) + "\n")
-      array[array[p+3]] = array[array[p+1]] * array[array[p+2]]
+    elif nArr[p] == 2:
+      nArr[nArr[p+3]] = nArr[nArr[p+1]] * nArr[nArr[p+2]]
       p += 4
 
-    elif array[p] == 99:
-      print("Ending loop on OPCODE 99")
-      return array
+    elif nArr[p] == 99:
+      return nArr
 
     else:
-      print("Unexpected OPCODE: " + str(array[p]))
+      print("Unexpected OPCODE: " + str(nArr[p]))
       return -1
 
+def checksum(value, filename):
+  array = initArray(filename)
+  for i in range(99):
+    for j in range(99):
+      tArray = array.copy()
+      tArray[1] = i
+      tArray[2] = j 
+      tArray = operateOn(tArray)
+      if tArray[0] == value:
+        return 100 * i + j
+
+  return -1
+
 beforeArray = initArray("Intcode.txt")
-print(len(beforeArray))
-print(beforeArray)
 afterArray = operateOn(beforeArray)
+
+print(checksum(19690720, "Intcode.txt"))
 print(afterArray[0])
