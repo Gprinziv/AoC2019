@@ -1,7 +1,3 @@
-#Day1 fuels.py
-#Giovanni Prinzivalli
-#05 December, 2019
-
 import math
 
 def recurFuel(mass):

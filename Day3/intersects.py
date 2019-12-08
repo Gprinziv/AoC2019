@@ -1,7 +1,3 @@
-#intersects.py
-#by Giovanni Prinzivalli
-#06 December, 2019
-
 #Open the file. 
 #Inputs filename with raw wire data.
 #Returns any number of wires to be plotted as a list.

@@ -1,7 +1,3 @@
-#orbits.py
-#by Giovanni Prinzivalli
-#08 December, 2019
-
 def initNodes(filename):
   with open(filename, "r") as f:
     nodes = f.read().splitlines()

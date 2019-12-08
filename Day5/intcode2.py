@@ -1,7 +1,3 @@
-#intcode2.py
-#by Giovanni Prinzivalli
-#06 December, 2019
-
 def initArray(filename):
   code = []
 

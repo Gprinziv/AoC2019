@@ -1,7 +1,3 @@
-#Day2 intcode.py
-#Giovanni Prinzivalli
-#05 December, 2019
-
 def initArray(filename):
   codes = open("Intcode.txt", "r")
   newArray = []

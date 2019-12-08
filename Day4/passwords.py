@@ -1,7 +1,3 @@
-#passwords.py
-#by Giovanni Prinzivalli
-#06 December, 2019
-
 class testIO:
   def mini(): return 387638
   def maxi(): return 919123
