@@ -17,6 +17,7 @@ def makeLayers(filename):
 
 layerList = makeLayers("layers")
 
+#Part 1
 minZeroes = layerList[0].count('0')
 indexOfMin = 0
 for i, layer in enumerate(layerList):
@@ -25,5 +26,15 @@ for i, layer in enumerate(layerList):
     minZeroes = zeroCount
     indexOfMin = i
 
-print(minZeroes)
 print(layerList[indexOfMin].count('2') * layerList[indexOfMin].count('1'))
+
+layerList.reverse()
+password = [0 for i in range(Layer.h() * Layer.w())]
+
+for layer in layerList:
+  for i, val in enumerate(layer):
+    if int(val) < 2:
+      password[i] = val
+
+for i in range(Layer.h()):
+  print("".join(password)[i * Layer.w() : (i + 1) * Layer.w()].replace('0', ' ').replace('1', 'X')) 
