@@ -3,6 +3,7 @@ import itertools
 #Needs a phase an an initial input value. 
 class Amplifier:
   def __init__(self, phase):
+    print("Initializing amp")
     self.phase = phase
 
   def setInput(in1):
@@ -10,7 +11,7 @@ class Amplifier:
 
   def output():
     return self.output.pop()
-    
+
 
 #Takes a filename as input and returns a list object to be operated on
 def initArray(filename):
@@ -147,5 +148,22 @@ perms = list(itertools.permutations(phases))
 outputs = []
 ampfile = "ampcontrol"
 
+
+ampA = Amplifier(ampA, 0)
+print(ampA)
+
+"""
 for code in perms:
+  ampA = Amplifier(code[0])
+  ampB = Amplifier(code[1])
+  ampC = Amplifier(code[2])
+  ampD = Amplifier(code[3])
+  ampE = Amplifier(code[4])
+
+  ampA.run(0)
+  ampB.run(ampA.output())
+  ampC.run(ampB.output())
+  ampD.run(ampC.output())
+  ampE.run(ampD.output())
   return "Fuck"
+"""
