@@ -2,13 +2,11 @@ import itertools
 
 #Needs a phase an an initial input value. 
 class Amplifier:
-  def __init__(self, phase, in1):
+  def __init__(self, phase):
     self.phase = phase
-    self.in1 = in1
 
-  def calculate(filename, phase, in1):
-    code = initArray(filename)
-    operateOn(code, [phase, in1], self.output)
+  def setInput(in1):
+    self.in1 = in1
 
   def output():
     return self.output.pop()
@@ -129,7 +127,6 @@ def checksum(value, filename):
   return -1
 
 """ Part 1
-For part 1
 phases = [0, 1, 2, 3, 4]
 perms = list(itertools.permutations(phases))
 outputs = []
