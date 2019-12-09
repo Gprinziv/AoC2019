@@ -9,9 +9,8 @@ class Amplifier:
     self.code = initArray(filename)
     self.p = 0
   
-  #On first run, initialize the code and set p to zero.
   #Then operate on the code until output isn't empty, pass that output to the next amp, and preserve p.
-  #When the file finishes..... ??????
+  #When the file finishes (p = -1, pass the final output one more time), and store amp E' soutput in the outputs global
 
 #Takes a filename as input and returns a list object to be operated on
 def initArray(filename):
@@ -142,7 +141,7 @@ for code in perms:
 
 print(max(i for i in outputs))
 """
-
+def __main__()
 phases = [5, 6, 7, 8, 9]
 perms = list(itertools.permutations(phases))
 outputs = []
