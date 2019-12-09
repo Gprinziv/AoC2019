@@ -20,7 +20,7 @@ def initArray(filename):
       code.append(int(instr))
   return code
 
-#Operates on a program. Uses inputs from a list and outputs to a list.
+#Operates on a program. Simply a middleman for performOp
 def operateOn(code, inputs, outputs):
   p = 0
   while p < len(code):
