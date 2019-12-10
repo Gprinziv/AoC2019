@@ -2,15 +2,34 @@ import itertools
 
 #Needs a phase an an initial input value. 
 class Amplifier:
-  def __init__(self, phase):
-    print("Initializing amp")
+  def __init__(self, filename, phase):
     self.phase = phase
+    self.inQueue = []
+    self.output = []
+    self.lastOut = 0
+    self.code = initArray(filename)
+    self.p = 0
 
-  def setInput(in1):
-    self.in1 = in1
+  def addInput(self, in1):
+    self.inQueue.append(in1)
 
-  def output():
-    return self.output.pop()
+  def out(self):
+    return self.lastOut
+
+  def setOutput(self):
+    self.lastOut = self.output.pop()
+
+  def run(self):
+    if self.p == 0:
+      self.addInput(self.phase)
+    while self.p < len(self.code):
+      if self.p < 0:
+        return
+
+      self.p = performOp(self.code, self.p, self.inQueue, self.output)
+      if self.output:
+        self.setOutput()
+        return
 
 
 #Takes a filename as input and returns a list object to be operated on
@@ -28,8 +47,6 @@ def operateOn(code, inputs, outputs):
     p = performOp(code, p, inputs, outputs)
     if p < 0:
       return p
-
-  print("End of file reached without termination.")
   return -10
 
 #Performs individual opertions.
@@ -127,7 +144,8 @@ def checksum(value, filename):
 
   return -1
 
-""" Part 1
+"""
+#Part 1
 phases = [0, 1, 2, 3, 4]
 perms = list(itertools.permutations(phases))
 outputs = []
@@ -143,27 +161,33 @@ for code in perms:
 print(max(i for i in outputs))
 """
 
+"""
+#Part 2
 phases = [5, 6, 7, 8, 9]
 perms = list(itertools.permutations(phases))
 outputs = []
 ampfile = "ampcontrol"
 
-
-ampA = Amplifier(ampA, 0)
-print(ampA)
-
-"""
 for code in perms:
-  ampA = Amplifier(code[0])
-  ampB = Amplifier(code[1])
-  ampC = Amplifier(code[2])
-  ampD = Amplifier(code[3])
-  ampE = Amplifier(code[4])
+  ampA = Amplifier(ampfile, code[0])
+  ampB = Amplifier(ampfile, code[1])
+  ampC = Amplifier(ampfile, code[2])
+  ampD = Amplifier(ampfile, code[3])
+  ampE = Amplifier(ampfile, code[4])
 
-  ampA.run(0)
-  ampB.run(ampA.output())
-  ampC.run(ampB.output())
-  ampD.run(ampC.output())
-  ampE.run(ampD.output())
-  return "Fuck"
+  ampA.addInput(0)
+  while ampE.p >= 0:
+    ampA.run()
+    ampB.addInput(ampA.out())
+    ampB.run()
+    ampC.addInput(ampB.out())
+    ampC.run()
+    ampD.addInput(ampC.out())
+    ampD.run()
+    ampE.addInput(ampD.out())
+    ampE.run()
+    ampA.addInput(ampE.out())
+  outputs.append(ampE.out())
+
+print(max(thrust for thrust in outputs))
 """
