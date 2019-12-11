@@ -1,90 +1,68 @@
 import itertools
 
-#Needs a phase an an initial input value. 
-class Amplifier:
-  def __init__(self, filename, phase):
-    self.phase = phase
-    self.inQueue = []
-    self.output = []
-    self.lastOut = 0
-    self.code = initArray(filename)
+class Program:
+  def __init__(self, filename, memSize = 1024):
+    self.code = [0] * memSize
+    with open(filename, "r") as f:
+      for i, instr in enumerate(f.read().split(",")):
+        self.code[i] = int(instr)
+
     self.p = 0
-
-  def addInput(self, in1):
-    self.inQueue.append(in1)
-
-  def out(self):
-    return self.lastOut
-
-  def setOutput(self):
-    self.lastOut = self.output.pop()
+    self.relBase = 0
+    self.inputs = []
+    self.output = []
 
   def run(self):
-    if self.p == 0:
-      self.addInput(self.phase)
     while self.p < len(self.code):
+      self.p = performOp(self)
       if self.p < 0:
         return
 
-      self.p = performOp(self.code, self.p, self.inQueue, self.output)
-      if self.output:
-        self.setOutput()
-        return
-
-#Takes a filename as input and returns a list object to be operated on
-def initArray(filename):
-  code = []
-  with open(filename, "r") as f:
-    for instr in f.read().split(","):
-      code.append(int(instr))
-  return code
-
-#Operates on a program. Simply a middleman for performOp
-def operateOn(code, inputs, outputs):
-  p = 0
-  while p < len(code):
-    p = performOp(code, p, inputs, outputs, relBase)
-    if p < 0:
-      break
-  return p
-
-def getParams(code, p):
-  opcode = code[p] % 100
-  p1 = int(code[p] / 100) % 10
-  p2 = int(code[p] / 1000) % 10
-  p3 = int(code[p] / 10000)
-
-
-
+def computeMode(code, addr, param, relBase):
+  if param == 0:
+    return code[addr]
+  elif param == 1:
+    return addr
+  elif param == 2:
+    return code[addr] + relBase
+  else:
+    print("Unexpected parameter. Operating in Position Mode.")
+    return code[addr]
 
 #Performs individual opertions.
 #Returns a address of the next operation, or an error code if an operation fails.
-def performOp(code, p, inputs, output):
+def performOp(prog):
+  #Just making the code less shit to write.
+  code = prog.code
+  p = prog.p
+  relBase = prog.relBase
+  #Divides an instruction into its components.
   opcode = code[p] % 100
-  params = getParams(code, p)
   p1 = int(code[p] / 100) % 10
   p2 = int(code[p] / 1000) % 10
   p3 = int(code[p] / 10000)
 
-
   #OP 1: Addition. Add two parameters and write to location p3.
   if opcode == 1:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
-    code[code[p+3]] = code[para1] + code[para2]
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
+    para3 = computeMode(code, p+3, p3, relBase)
+    code[para3] = code[para1] + code[para2]
     return p + 4
 
   #OP 1: Multiplication. Multiply two parameters and write to location p3.
   elif opcode == 2:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
-    code[code[p+3]] = code[para1] * code[para2]
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
+    para3 = computeMode(code, p+3, p3, relBase)
+    code[para3] = code[para1] * code[para2]
     return p + 4
 
   #OP 3: Write. Input integer to location p1. Returns -3 if insufficient inputs.
-  elif opcode == 3: 
+  elif opcode == 3:
+    para1 = computeMode(code, p+1, p1, relBase) 
     try:
-      code[code[p+1]] = inputs.pop()
+      code[para1] = prog.inputs.pop()
     except IndexError:
       print("Insufficient number of inputs for program. Quitting.")
       return -3
@@ -92,9 +70,9 @@ def performOp(code, p, inputs, output):
     
   #OP4: Read. Print value of location p1. Returns -4 if outputs invalid (not a list)
   elif opcode == 4:
-    para1 = p+1 if p1 == 1 else code[p+1]
+    para1 = computeMode(code, p+1, p1, relBase)
     try:
-      output.append(code[para1])
+      prog.output.append(code[para1])
     except IndexError:
       print("Failure to write to output")
       return -4
@@ -102,8 +80,8 @@ def performOp(code, p, inputs, output):
 
   #OP5: Jump-if-true. If p+1 is nonzero, jump to p+2.
   elif opcode == 5:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
     if code[para1] != 0:
       return code[para2]
     else:
@@ -111,8 +89,8 @@ def performOp(code, p, inputs, output):
 
   #OP6: Jump-if-false: If p+1 is zerp, jump to p+2
   elif opcode == 6:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
     if code[para1] == 0:
       return code[para2]
     else:
@@ -120,22 +98,24 @@ def performOp(code, p, inputs, output):
 
   #OP7: Lesser. If p+1 is less than p+2, write 1 to p+3, else write 0.
   elif opcode == 7:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
-    code[code[p+3]] = 1 if code[para1] < code[para2] else 0
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
+    para3 = computeMode(code, p+3, p3, relBase)
+    code[para3] = 1 if code[para1] < code[para2] else 0
     return p + 4
       
   #OP8: Equals. If p+1 equals p+2, write 1 to p+3, else write 0.  
   elif opcode == 8:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    para2 = p+2 if p2 == 1 else code[p+2]
-    code[code[p+3]] = 1 if code[para1] == code[para2] else 0
+    para1 = computeMode(code, p+1, p1, relBase)
+    para2 = computeMode(code, p+2, p2, relBase)
+    para3 = computeMode(code, p+3, p3, relBase)
+    code[para3] = 1 if code[para1] == code[para2] else 0
     return p + 4
 
   #OP9: Relative Base Offset. Increments (or decrements) the relative base by the first parameter
   elif opcode == 9:
-    para1 = p+1 if p1 == 1 else code[p+1]
-    relBase += code[para1]
+    para1 = computeMode(code, p+1, p1, relBase)
+    prog.relBase += code[para1]
     return p + 2
 
   #OP99: Exit. Returns -1, indicating program completed siccessfully.
@@ -147,19 +127,8 @@ def performOp(code, p, inputs, output):
     print("ERROR: Unexpected OPCODE: " + str(code[p]))
     return -2
 
-def checksum(value, filename):
-  array = initArray(filename)
-  for i in range(99):
-    for j in range(99):
-      tArray = array.copy()
-      tArray[1] = i
-      tArray[2] = j 
-      tArray = operateOn(tArray, 1)
-      if tArray[0] == value:
-        return 100 * i + j
-
-  return -1
-
-out=[]
-operateOn(initArray("diagnostic2"), [8], out)
-print(out)
+prog = Program("boost", 2048)
+prog.inputs.append(2)
+print("Running program")
+prog.run()
+print(prog.output)
