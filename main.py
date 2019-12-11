@@ -18,12 +18,12 @@ class Intcode:
     #inputVal: A single (for now) input value to be used when running the program
     #numOuts: The program runs until the number of outputs is reached, then pauses.
   def run(self, inputVal = None, numOuts = None):
-    if inputVal:
+    if inputVal is not None:
       self.inputs.append(inputVal)
 
     while 0 <= self.p < len(self.code):
       self.p = performOp(self)
-      if numOuts and len(self.output) == numOuts:
+      if numOuts is not None and len(self.output) == numOuts:
         return
 
   #Computes the mode of parameters being passed into an operation. Returns the proper address for the code to execute from.
@@ -41,21 +41,18 @@ class Intcode:
       return self.code[self.p + offset]
 
 class Robot:
-  def __init__(self, grid = None):
-    if grid:
-      self.x = None
-      self.y = None
-      #Robot x and y = half of grid.
-    else:
-      self.x = None
-      self.y = None
+  def __init__(self, w = 100, h = 100):
+    self.grid = [[0] * w] * h
+    self.x = int(w/2)
+    self.y = int(h/2)
     self.facing = 0
 
   #Rotate clockwise if rotate is 1, counterclockwise if rotate is 0
   #Facing: 0 - Up, 1 - Right, 2 - Down, 3 - Left
   def changeFace(self, rotate):
     #Ensures that turning counterclockwise leaves you facing left
-    self.facing = (self.facing + 4 + 1 if rotate == 1 else -1) % 4
+    self.facing = (self.facing + 4 + (1 if rotate == 1 else -1)) % 4
+  
 
   #moves forward 1 step based on facing.
   def move(self):
@@ -68,20 +65,34 @@ class Robot:
     else:
       self.x += -1
 
+  def paint(self, color):
+      self.grid[self.y][self.x] = color if color == 1 else 2
+
+  def getColor(self):
+    return 1 if self.grid[self.y][self.x] == 1 else 0
+
 def paintShip():
-  prog = Intcode("paintcode")
-  rob = Robot() #Need a grid
+  prog = Intcode("paintcode", 2048)
+  rob = Robot()
 
-  newInput = 0 #Robot starting location grid color in future.
-  while prog.p >= 0:
+  newInput = rob.getColor()
+  while True:
     prog.run(newInput, 2)
-    #Mark it as having been painted.... somehow
+    if(prog.p < 0):
+      print("Finish with code " + str(prog.p))
+      break
     rob.changeFace(prog.output.pop())
+    rob.paint(prog.output.pop())
     rob.move()
-    newInput = prog.output.pop()
+    newInput = rob.getColor()
 
-  #Notes: Need some way to make a grid for the robot to paint on. Needs to be rapidly iterable. 3 Colors: 1 (black unpainted), 2 (white), 3(black painted) 
-
+  #OH MY GOD i HAVE A HEADACHE.
+  listOfStrings = []
+  for line in rob.grid:
+    listOfStrings.append(''.join([str(elem) for elem in line]))
+  print(listOfStrings)
+  for line in listOfStrings:
+    print(line)
 
 #Performs individual opertaions.
 #Returns a address of the next operation, or an error code if an operation fails.
@@ -177,6 +188,9 @@ def performOp(prog):
   else:
     print("ERROR: Unexpected OPCODE: " + str(code[p]))
     return -2
+
+
+paintShip()
 
 #Most basic program executable.
 #Expected output: 82760.
