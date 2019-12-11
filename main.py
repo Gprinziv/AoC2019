@@ -41,8 +41,8 @@ class Intcode:
       return self.code[self.p + offset]
 
 class Robot:
-  def __init__(self, w = 100, h = 100):
-    self.grid = [[0] * w] * h
+  def __init__(self, w = 100, h = 50):
+    self.grid = [[0 for i in range(w)] for j in range(h)] #I'm clearly fucking this up.
     self.x = int(w/2)
     self.y = int(h/2)
     self.facing = 0
@@ -75,6 +75,7 @@ def paintShip():
   prog = Intcode("paintcode", 2048)
   rob = Robot()
 
+  rob.paint(1)
   newInput = rob.getColor()
   while True:
     prog.run(newInput, 2)
@@ -86,13 +87,12 @@ def paintShip():
     rob.move()
     newInput = rob.getColor()
 
-  #OH MY GOD i HAVE A HEADACHE.
+  #OH MY GOD i HAVE A HEADACHE. I can't figure out how to better print this.
   listOfStrings = []
   for line in rob.grid:
     listOfStrings.append(''.join([str(elem) for elem in line]))
-  print(listOfStrings)
   for line in listOfStrings:
-    print(line)
+    print(line.replace('0', ' ').replace('1', 'X').replace('2', ' '))
 
 #Performs individual opertaions.
 #Returns a address of the next operation, or an error code if an operation fails.
