@@ -56,4 +56,3 @@ def main():
   runFFT('biginput', 100)
   
 if __name__ == "__main__":
-  main()
