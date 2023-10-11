@@ -1,6 +1,5 @@
 from collections import deque
-#from Intcode import intcode
-#Fix this.
+import Intcode
 
 class Droid:
   def __init__(self, filename):

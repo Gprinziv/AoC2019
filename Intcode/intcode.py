@@ -1,6 +1,6 @@
 class Intcode:
-  #initializes code from a "punchcard" with a default of 1024 memory locations.
-  def __init__(self, filename, memSize = 4096):
+  #initializes code from a "punchcard" with a default of 2048 memory locations.
+  def __init__(self, filename, memSize = 9192):
     self.code = [0] * memSize
     with open(filename, "r") as f:
       for i, instr in enumerate(f.read().split(",")):
